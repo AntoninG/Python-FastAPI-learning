@@ -31,16 +31,17 @@ async def about():
 @app.get('/items/{item_id}')
 async def item(
         item_id: int = Path(None, description='Item ID', ge=1),
-        query: str = Query(None, description='Search query')) -> dict | None:
+        query: str = Query(None, description='Search query')) -> dict:
     item = inventory.get(item_id)
+    if item is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='Item not found')
+
     if query is None:
         return item
 
     if query.lower() in item['name'].lower():
         return item
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                        detail='Item not found')
 
 
 @app.get('/items')
