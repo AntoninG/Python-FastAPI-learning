@@ -1,16 +1,21 @@
-from fastapi import FastAPI
-from enum import Enum
+from fastapi import FastAPI, Path, Query, HTTPException, status
+from pydantic import BaseModel
 
 app = FastAPI()
 
+inventory: dict = {
+    1: {
+        'name': "Agrax Earthshade",
+        'price': 6.30,
+        'brand': 'Citadel GW'
+    }
+}
 
-class Entity(str, Enum):
-    users = 'users'
-    todo_lists = 'todo-lists'
 
-
-fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"},
-                 {"item_name": "Baz"}]
+class Item(BaseModel):
+    name: str
+    price: float
+    brand: str = None
 
 
 @app.get('/')
@@ -18,30 +23,56 @@ async def root() -> dict:
     return {'message': 'Root', 'status': 'OK'}
 
 
-@app.get('/users/me')
-async def me() -> dict:
-    return {'user_id': 'Incel'}
+@app.get('/about')
+async def about():
+    return {'About': 'Lorem Ispum'}
 
 
-@app.get('/{entities}/{entity_id}')
-async def read_entity(entities: Entity, entity_id: int) -> dict:
-    return {'entities': entities, 'id': entity_id}
+@app.get('/items/{item_id}')
+async def item(
+        item_id: int = Path(None, description='Item ID', ge=1),
+        query: str = Query(None, description='Search query')) -> dict | None:
+    item = inventory.get(item_id)
+    if query is None:
+        return item
+
+    if query.lower() in item['name'].lower():
+        return item
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail='Item not found')
 
 
-@app.get('/{entities}')
-async def read_entities(entities: Entity, offset: int = 0, limit: int = 1,
-                        query: str | None = None) -> list:
-    items = fake_items_db[offset: offset + limit]
-    if not query:
-        return items
+@app.get('/items')
+async def items(
+        *,  # This accepts any number of keyword arguments
+        query: str = Query(None, description='Search query')) -> list:
+    if query is None:
+        return list(inventory.values())
 
-    for key, item in enumerate(items):
-        if query not in item['item_name']:
-            del items[key]
+    result: list = []
+    for key in inventory:
+        item = inventory[key]
+        if query in item['name'].lower():
+            result.append(item)
 
-    return items
+    return result
 
 
-@app.post('/todo-lists')
-async def post_todo_list(todo_list):
-    return todo_list
+@app.post('/items')
+async def create(item: Item) -> dict:
+    max_item_id = max(list(inventory.keys()))
+    item_dict = item.dict()
+    item_dict.update({'item_id': max_item_id + 1})
+    return item_dict
+
+
+@app.patch('/items/{item_id}')
+async def patch(item_id: int, post: Item) -> dict:
+    if item_id not in inventory:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='Item not found')
+
+    item = inventory[item_id]
+    item.update(post.dict())
+    return item
