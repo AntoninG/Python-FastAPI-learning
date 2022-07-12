@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Path, Query, HTTPException, status
+import json
+import os
+from dotenv import load_dotenv
+
+from fastapi import FastAPI, Path, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
-
 from pydantic import BaseModel
-from dotenv import load_dotenv
-import os
 
 load_dotenv()
 app = FastAPI(
@@ -13,18 +14,12 @@ app = FastAPI(
 )
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
-inventory: dict = {
-    1: {
-        'name': "Agrax Earthshade",
-        'price': 6.30,
-        'brand': 'Citadel GW'
-    }
-}
 
-class Item(BaseModel):
-    name: str
-    price: float
-    brand: str | None = None
+class Article(BaseModel):
+    title: str
+    content: str
+    published_at: str | None = None
+    metadata: dict | None = {}
 
 
 @app.get("/docs", include_in_schema=False)
@@ -38,62 +33,54 @@ async def custom_swagger_ui_html():
     )
 
 
-@app.get('/')
-async def root() -> dict:
-    return {'message': 'Root', 'status': 'OK'}
+@app.get('/', summary='Root', description='Root')
+async def index():
+    return {'data': {'name': 'AGU', 'message': 'Hello world'}}
 
 
-@app.get('/about')
+@app.get('/about', description='About the API')
 async def about():
-    return {'About': 'Lorem Ispum'}
+    return json.load(open(os.getcwd() + '/static/about.json'))
 
 
-@app.get('/items/{item_id}')
-async def item(
-        item_id: int = Path(None, description='Item ID', ge=1),
-        query: str = Query(None, description='Search query')) -> dict:
-    item = inventory.get(item_id)
-    if item is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='Item not found')
-
-    if query is None:
-        return item
-
-    if query.lower() in item['name'].lower():
-        return item
+@app.get(
+    '/articles/{id}',
+    summary='Display a specific article',
+    status_code=200
+)
+async def show(id: int = Path(description="Article ID")):
+    return {'data': {'id': id}}
 
 
-@app.get('/items')
-async def items(
-        *,  # This accepts any number of keyword arguments
-        query: str = Query(None, description='Search query')) -> list:
-    if query is None:
-        return list(inventory.values())
-
-    result: list = []
-    for key in inventory:
-        item = inventory[key]
-        if query in item['name'].lower():
-            result.append(item)
-
-    return result
+@app.get(
+    '/articles/{id}/comments',
+    summary='Display a specific article comments',
+    status_code=200
+)
+async def show_comments(id: int = Path(description="Article ID")):
+    return {'data': {'comments': list(range(0, id))}}
 
 
-@app.post('/items')
-async def create(item: Item) -> dict:
-    max_item_id = max(list(inventory.keys()))
-    item_dict = item.dict()
-    item_dict.update({'item_id': max_item_id + 1})
-    return item_dict
+@app.get('/articles')
+async def index(
+        limit: int | None = Query(100,
+                                  description='Maximum size of results set'),
+        offset: int | None = Query(0,
+                                   description='Starting offset of results set'),
+        query: str | None = Query(None,
+                                  description='Query string to filter results set on title and content'),
+        published: bool | None = Query(None,
+                                       description='Only published or unpublished articles')
+):
+    articles = list(range(offset, limit))
+    for key, item in enumerate(articles):
+        articles[key] = {
+            'name': query if query is not None else None,
+            'status': 'available' if published is None else 'published' if published is True else 'unpublished'
+        }
+    return articles
 
 
-@app.patch('/items/{item_id}')
-async def patch(item_id: int, post: Item) -> dict:
-    if item_id not in inventory:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='Item not found')
-
-    item = inventory[item_id]
-    item.update(post.dict())
-    return item
+@app.post('/articles', status_code=201)
+async def create(article: Article):
+    return article.dict()
