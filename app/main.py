@@ -1,8 +1,12 @@
-import os, pkgutil
+import os
+import pkgutil
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
 from . import models, database, routers
+from .middlewares import print_timings
 
 load_dotenv()
 app = FastAPI(
@@ -23,15 +27,31 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 
 models.Base.metadata.create_all(database.engine)
 
-# Routes
-for importer, name, ispkg in list(pkgutil.iter_modules(routers.__path__)):
-    module_package_name = '{0}.{1}'.format(routers.__dict__['__package__'], name)
-    module = pkgutil.get_loader(module_package_name)\
-        .load_module(module_package_name)
 
+def load_modules(path, package):
+    modules = []
+    for importer, name, ispkg in list(pkgutil.iter_modules(path)):
+        module_package_name = '{0}.{1}'.format(package, name)
+        module = pkgutil.get_loader(module_package_name) \
+            .load_module(module_package_name)
+
+        if ispkg:
+            modules += load_modules(module.__path__, module.__package__)
+        modules.append(module)
+
+    return modules
+
+
+# Routes
+for module in load_modules(routers.__path__, routers.__package__):
     if not hasattr(module, 'router'):
         continue
 
     app.include_router(module.router,
-                       prefix=module.prefix if hasattr(module, 'prefix') else '',
+                       prefix=module.prefix if hasattr(module,
+                                                       'prefix') else '',
                        tags=module.tags if hasattr(module, 'tags') else None)
+
+# Middlewares
+print_timings.PrintTimingsMiddleware(app)
+
