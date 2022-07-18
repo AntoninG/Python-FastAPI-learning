@@ -1,4 +1,4 @@
-from timing_asgi import TimingMiddleware, TimingClient
+from timing_asgi import TimingClient, TimingMiddleware
 from timing_asgi.integrations import StarletteScopeToName
 
 
@@ -12,6 +12,8 @@ class PrintTimingsMiddleware(object):
         app.add_middleware(
             TimingMiddleware,
             client=PrintTimings(),
-            metric_namer=StarletteScopeToName(prefix="fastpi",
-                                              starlette_app=app)
+            metric_namer=StarletteScopeToName(
+                prefix="fastpi",
+                starlette_app=app
+            )
         )
