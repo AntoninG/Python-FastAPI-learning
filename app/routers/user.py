@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Path, Query, status, HTTPException
-from ..schemas import requests, resources
+from fastapi import APIRouter, HTTPException, Path, Query, status
+
+from app.utils.hashing import Hash
+
 from ..repositories import user
-from ..hashing import Hash
+from ..schemas.requests.user import CreateUserRequest, PasswordVerifyRequest
+from ..schemas.resources.user import UserResource, ReadUserResource
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -14,8 +17,8 @@ router = APIRouter(prefix='/users', tags=['users'])
                  status.HTTP_201_CREATED: {'description': 'User created'},
                  status.HTTP_404_NOT_FOUND: {'description': 'User not found'}
              },
-             response_model=resources.UserResource)
-def create(request: requests.CreateUserRequest):
+             response_model=UserResource)
+def create(request: CreateUserRequest):
     return user.create(request.dict())
 
 
@@ -27,7 +30,7 @@ def create(request: requests.CreateUserRequest):
                 status.HTTP_200_OK: {'description': 'User found'},
                 status.HTTP_404_NOT_FOUND: {'description': 'User not found'}
             },
-            response_model=resources.ReadUserResource)
+            response_model=ReadUserResource)
 def read(id: int = Path(description="User ID")):
     return user.get(id)
 
@@ -40,9 +43,10 @@ def read(id: int = Path(description="User ID")):
              responses={
                  status.HTTP_200_OK: {'description': 'Password verified'},
                  status.HTTP_404_NOT_FOUND: {'description': 'Email not found'},
-                 status.HTTP_401_UNAUTHORIZED: {'description': 'Wrong password'}
+                 status.HTTP_401_UNAUTHORIZED: {
+                     'description': 'Wrong password'}
              })
-def verify_password(request: requests.PasswordVerifyRequest,
+def verify_password(request: PasswordVerifyRequest,
                     email: str = Query(description="Email to compare password with")):
     user_db = user.find({'email': email}, True)
     if not user_db:
