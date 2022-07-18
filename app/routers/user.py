@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 from app.utils.hashing import Hash
 
 from app.repositories import user
-from app.schemas.requests.user import CreateUserRequest, PasswordVerifyRequest
-from app.schemas.resources.user import UserResource, ReadUserResource
+from app.schemas.requests import CreateUserRequest, PasswordVerifyRequest
+from app.schemas.resources import UserResource, ReadUserResource
 
 router = APIRouter(prefix='/users', tags=['users'])
 

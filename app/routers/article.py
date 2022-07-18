@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Path, Query, status
 
-from ..repositories import article as article_repository
-from ..schemas.requests.article import CreateArticleRequest
-from ..schemas.resources.article import ArticleResource, ReadArticleResource
+from app.repositories import article as article_repository
+from app.schemas.requests import CreateArticleRequest
+from app.schemas.resources import ArticleResource, ReadArticleResource
 
 router = APIRouter(prefix='/articles', tags=['articles'])
 

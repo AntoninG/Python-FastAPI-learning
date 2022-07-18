@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app import middlewares, routes
+from . import middleware, route, event
 
 load_dotenv()
 app = FastAPI(
@@ -24,7 +24,10 @@ app = FastAPI(
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 # Routes
-routes.load_routes(app)
+route.load_routes(app)
 
 # Middlewares
-middlewares.load_middlewares(app)
+middleware.load_middlewares(app)
+
+# Events
+event.load_events(app)
