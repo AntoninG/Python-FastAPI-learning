@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from . import database, middlewares, routes
+from app import middlewares, routes
 
 load_dotenv()
 app = FastAPI(
@@ -22,9 +22,6 @@ app = FastAPI(
     redoc_url=os.getenv('REDOC_URL', '/redoc'),
 )
 app.mount('/static', StaticFiles(directory='static'), name='static')
-
-# Create DB schemas
-database.Base.metadata.create_all(database.engine)
 
 # Routes
 routes.load_routes(app)

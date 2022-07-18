@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from .middlewares import print_timings
+from app.middlewares import print_timings
 
 
 def load_middlewares(app: FastAPI):

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from .user import UserResource
+from app.schemas.resources.user import UserResource
 
 
 class ArticleResource(BaseModel):
