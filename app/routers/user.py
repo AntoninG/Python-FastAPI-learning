@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, Path, Query, status
+from fastapi import (APIRouter, Depends, HTTPException, Path, Query, Response,
+                     status)
+from sqlalchemy.orm import Session
 
-from app.utils.hashing import Hash
-
+from app.main import get_db
 from app.repositories import user
 from app.schemas.requests import CreateUserRequest, PasswordVerifyRequest
-from app.schemas.resources import UserResource, ReadUserResource
+from app.schemas.resources import ReadUserResource, UserResource
+from app.utils.hashing import Hash
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -18,8 +20,8 @@ router = APIRouter(prefix='/users', tags=['users'])
                  status.HTTP_404_NOT_FOUND: {'description': 'User not found'}
              },
              response_model=UserResource)
-def create(request: CreateUserRequest):
-    return user.create(request.dict())
+def create(request: CreateUserRequest, db: Session = Depends(get_db)):
+    return user.create(db, request.dict())
 
 
 @router.get('/{id}',
@@ -31,8 +33,8 @@ def create(request: CreateUserRequest):
                 status.HTTP_404_NOT_FOUND: {'description': 'User not found'}
             },
             response_model=ReadUserResource)
-def read(id: int = Path(description="User ID")):
-    return user.get(id)
+def read(id: int = Path(description="User ID"), db: Session = Depends(get_db)):
+    return user.get(db, id)
 
 
 @router.post('/verify-password',
@@ -47,10 +49,11 @@ def read(id: int = Path(description="User ID")):
                      'description': 'Wrong password'}
              })
 def verify_password(request: PasswordVerifyRequest,
-                    email: str = Query(description="Email to compare password with")):
-    user_db = user.find({'email': email}, True)
+                    email: str = Query(description="Email to compare password with"),
+                    db: Session = Depends(get_db)):
+    user_db = user.find(db, {'email': email}, True)
     if not user_db:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
     if not Hash.verify(request.password, user_db.password):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED)

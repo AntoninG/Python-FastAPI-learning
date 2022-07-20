@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.events import on_shutdown_events
-from app.events import on_startup_events
+
+from app.events import on_shutdown_events, on_startup_events
 
 
 def load_events(app: FastAPI):
