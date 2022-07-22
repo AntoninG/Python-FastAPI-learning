@@ -1,17 +1,18 @@
+"""
+Users repository to manipulate User models
+"""
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.utils.hashing import Hash
 
-from .. import database
 from ..models.user import User
 
-db: Session = database.SessionLocal()
 
-
-def get(db: Session, id: int) -> User:
-    user = db.query(User).filter(User.id == id).first()
+def get(db: Session, id_user: int) -> User:
+    user = db.query(User).filter(User.id == id_user).first()
     if not user:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
@@ -28,8 +29,8 @@ def create(db: Session, request: dict) -> User:
         db.add(user)
         db.commit()
         db.refresh(user)
-    except IntegrityError:
-        raise HTTPException(status.HTTP_304_NOT_MODIFIED)
+    except IntegrityError as e:
+        raise HTTPException(status.HTTP_304_NOT_MODIFIED) from e
 
     return user
 
