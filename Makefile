@@ -1,8 +1,10 @@
 test:
 	coverage run -m pytest -vv
-
-coverage:
 	coverage report -m | more
+	coverage-badge -f -o coverage-badge.svg
+
+make pylint:
+	pylint app
 
 server:
 	uvicorn app.main:app --reload

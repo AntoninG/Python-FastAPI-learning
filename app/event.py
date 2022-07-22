@@ -1,3 +1,7 @@
+"""
+Loads app events
+"""
+
 from fastapi import FastAPI
 
 from app.events import on_shutdown_events, on_startup_events

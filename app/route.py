@@ -1,3 +1,7 @@
+"""
+Loads app routes
+"""
+
 from app.utils.modules import load_modules
 
 from . import routers

@@ -1,3 +1,7 @@
+"""
+App main
+"""
+
 import os
 
 from dotenv import load_dotenv
@@ -9,7 +13,7 @@ from . import database, event, middleware, route
 load_dotenv()
 app = FastAPI(
     title="News articles",
-    description='',
+    description="",
     version="0.0.1",
     terms_of_service=None,
     contact={
@@ -18,10 +22,10 @@ app = FastAPI(
         "email": "antonin.guilet-dupont@laposte.net",
     },
     license_info=None,
-    docs_url=os.getenv('DOCS_URL', '/docs'),
-    redoc_url=os.getenv('REDOC_URL', '/redoc'),
+    docs_url=os.getenv("DOCS_URL", "/docs"),
+    redoc_url=os.getenv("REDOC_URL", "/redoc"),
 )
-app.mount('/static', StaticFiles(directory='static'), name='static')
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Create DB schemas
 database.Base.metadata.create_all(database.engine)

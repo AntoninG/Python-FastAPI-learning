@@ -1,6 +1,11 @@
+"""
+Resources schemas answered by the app
+"""
+
 from pydantic import BaseModel
 
 
+# pylint: disable=too-few-public-methods
 class ArticleResource(BaseModel):
     id: int
     title: str

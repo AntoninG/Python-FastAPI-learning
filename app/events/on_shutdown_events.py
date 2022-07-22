@@ -1,6 +1,10 @@
+"""
+Containing events to handle on app shutdown
+"""
+
 import datetime
 
 
 def shutdown_print():
-    print('App shutdown [{0}]'.format(str(datetime.datetime.now())))
-
+    datetime_str = str(datetime.datetime.now())
+    print(f'App shutdown [{datetime_str}]')
