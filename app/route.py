@@ -1,5 +1,6 @@
+from app.utils.modules import load_modules
+
 from . import routers
-from .utils.modules import load_modules
 
 
 def load_routes(app):

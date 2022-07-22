@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 
-from .user import UserResource
-
 
 class ArticleResource(BaseModel):
     id: int
@@ -10,6 +8,19 @@ class ArticleResource(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserResource(BaseModel):
+    id: int
+    name: str
+    email: str
+
+    class Config:
+        orm_mode = True
+
+
+class ReadUserResource(UserResource):
+    articles: list[ArticleResource] = []
 
 
 class ReadArticleResource(ArticleResource):

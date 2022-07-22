@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from . import database, middlewares, routes
+from . import database, event, middleware, route
 
 load_dotenv()
 app = FastAPI(
@@ -26,8 +26,21 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 # Create DB schemas
 database.Base.metadata.create_all(database.engine)
 
+
+# Dependency
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 # Routes
-routes.load_routes(app)
+route.load_routes(app)
 
 # Middlewares
-middlewares.load_middlewares(app)
+middleware.load_middlewares(app)
+
+# Events
+event.load_events(app)

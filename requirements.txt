@@ -6,3 +6,10 @@ sqlalchemy
 passlib
 bcrypt
 timing-asgi
+pytest
+coverage
+requests
+email-validator
+password-validator
+python-dateutil
+strawberry-graphql
