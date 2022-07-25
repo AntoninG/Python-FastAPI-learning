@@ -3,7 +3,7 @@ Requests bodies accepted by the app
 """
 
 from password_validator import PasswordValidator
-from pydantic import BaseModel, EmailStr, constr, validator
+from pydantic import BaseModel, EmailStr, SecretStr, constr, validator
 
 
 # pylint: disable=too-few-public-methods
@@ -44,3 +44,9 @@ class CreateUserRequest(BaseModel):
 
 class PasswordVerifyRequest(BaseModel):
     password: str
+
+
+class TokenData(BaseModel):
+    id: int
+    username: str
+    name: str
