@@ -2,7 +2,7 @@
 Resources schemas answered by the app
 """
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 
 # pylint: disable=too-few-public-methods
@@ -30,3 +30,12 @@ class ReadUserResource(UserResource):
 
 class ReadArticleResource(ArticleResource):
     author: UserResource
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class UserPersonalInformationResource(ReadUserResource):
+    password: SecretStr

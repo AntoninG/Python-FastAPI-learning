@@ -44,3 +44,9 @@ class CreateUserRequest(BaseModel):
 
 class PasswordVerifyRequest(BaseModel):
     password: str
+
+
+class TokenData(BaseModel):
+    id: int
+    username: str
+    name: str

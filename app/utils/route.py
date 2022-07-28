@@ -2,9 +2,8 @@
 Loads app routes
 """
 
+from app import routers
 from app.utils.modules import load_modules
-
-from . import routers
 
 
 def load_routes(app):

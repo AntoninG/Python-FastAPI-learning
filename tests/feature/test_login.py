@@ -1,5 +1,5 @@
 from app.repositories import user
-from tests.main import TestCase, TestingSessionLocal, client
+from tests.main import TestCase, client
 
 
 class TestPassword(TestCase):
@@ -8,8 +8,7 @@ class TestPassword(TestCase):
     def setUp(self) -> None:
         super(TestPassword, self).setUp()
 
-        db = TestingSessionLocal()
-        user.create(db, {
+        user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
             'password': 'dev3387V!DEO'

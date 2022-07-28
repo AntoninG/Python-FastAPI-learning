@@ -5,7 +5,7 @@ Article model
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.database import Base
+from app.utils.database import Base
 
 
 # pylint: disable=too-few-public-methods

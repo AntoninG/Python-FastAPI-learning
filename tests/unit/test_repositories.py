@@ -1,15 +1,9 @@
-from sqlalchemy.orm import Session
-
-from app.repositories import article, user
-from tests.main import TestCase, TestingSessionLocal
+from tests.main import TestCase
 
 
 class TestUserRepository(TestCase):
-    db: Session = None
-
     def setUp(self) -> None:
         super(TestUserRepository, self).setUp()
-        self.db = TestingSessionLocal()
 
     def test_create_user(self):
         pass
@@ -19,11 +13,8 @@ class TestUserRepository(TestCase):
 
 
 class TestArticleRepository(TestCase):
-    db: Session = None
-
     def setUp(self) -> None:
         super(TestArticleRepository, self).setUp()
-        self.db = TestingSessionLocal()
 
     def test_create_article(self):
         pass

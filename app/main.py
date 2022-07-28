@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from . import database, event, middleware, route
+from app.utils import database, event, middleware, route
 
 load_dotenv()
 app = FastAPI(
