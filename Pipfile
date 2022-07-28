@@ -15,16 +15,17 @@ email-validator = "*"
 password-validator = "*"
 timing-asgi = "*"
 python-jose = "*"
-cryptoraphy = "*"
+cryptography = "*"
 requests = "*"
 strawberry-graphql = "*"
 
 [dev-packages]
+pipenv = "*"
 pylint = "*"
 pytest = "*"
 coverage = "*"
 coverage-badge = "*"
-
+anybadge = "*"
 
 [requires]
 python_version = "3.10"

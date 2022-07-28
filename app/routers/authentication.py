@@ -6,9 +6,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.main import get_db
+from app.models.user import User
 from app.repositories import user as user_repository
-from app.schemas.requests import TokenData
-from app.schemas.resources import UserPersonalInformationResource, Token
+from app.schemas.resources import Token, UserPersonalInformationResource
 from app.utils.hashing import Hash
 from app.utils.oauth2 import current_user
 from app.utils.token import create_access_token
@@ -24,6 +24,12 @@ router = APIRouter(tags=["Authentication"])
 )
 def login(request: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)):
+    """
+    Login route to obtain JWT
+    :param request: OAuth2 request
+    :param db: DB connection
+    :return: JWT
+    """
     user = user_repository.find(db, {"email": request.username}, True)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -46,6 +52,5 @@ def login(request: OAuth2PasswordRequestForm = Depends(),
     description="Get connected user's personal information",
     response_model=UserPersonalInformationResource
 )
-def me_i_and_myself(user_token: TokenData = Depends(current_user),
-                    db: Session = Depends(get_db)):
-    return user_repository.get(db, user_token.id)
+def me_i_and_myself(user: User = Depends(current_user)):
+    return user

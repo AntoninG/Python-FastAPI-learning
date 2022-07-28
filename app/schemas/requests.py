@@ -3,7 +3,7 @@ Requests bodies accepted by the app
 """
 
 from password_validator import PasswordValidator
-from pydantic import BaseModel, EmailStr, SecretStr, constr, validator
+from pydantic import BaseModel, EmailStr, constr, validator
 
 
 # pylint: disable=too-few-public-methods

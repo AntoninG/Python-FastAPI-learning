@@ -1,5 +1,5 @@
 from app.repositories import article, user
-from tests.main import TestCase, TestingSessionLocal, client
+from tests.main import TestCase, client
 
 
 class TestPostUser(TestCase):
@@ -154,7 +154,7 @@ class TestGetUser(TestCase):
         }
 
     def test_get_user_without_articles(self):
-        user.create(TestingSessionLocal(), {
+        user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
             'password': 'dev3387V!DEO',
@@ -170,9 +170,7 @@ class TestGetUser(TestCase):
         }
 
     def test_get_user_with_articles(self):
-        db = TestingSessionLocal()
-
-        user.create(db, {
+        user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
             'password': 'dev3387V!DEO',

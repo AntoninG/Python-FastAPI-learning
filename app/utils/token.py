@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from app.schemas.requests import TokenData
 
 
-def create_access_token(data: dict):
+def create_access_token(data: dict) -> str:
     to_encode = data.copy()
 
     expires = datetime.utcnow()
@@ -23,7 +23,8 @@ def create_access_token(data: dict):
     )
 
 
-def verify_token(token: str, credentials_exception: Exception) -> TokenData:
+def verify_token(token: str,
+                 credentials_exception: Exception | None = None) -> TokenData:
     try:
         payload = jwt.decode(
             token,
@@ -37,4 +38,4 @@ def verify_token(token: str, credentials_exception: Exception) -> TokenData:
 
         return TokenData(**payload)
     except JWTError as e:
-        raise credentials_exception from e
+        raise credentials_exception if credentials_exception is not None else e

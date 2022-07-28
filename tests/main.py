@@ -3,7 +3,7 @@ import unittest
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 import app.utils.database as database
 from app.main import app, get_db
@@ -33,12 +33,16 @@ client = TestClient(app)
 
 
 class TestCase(unittest.TestCase):
+    refresh_database: bool = True
+    db: Session | None
+
     def setUp(self) -> None:
-        pass
+        self.db = TestingSessionLocal()
 
     def tearDown(self) -> None:
-        with contextlib.closing(engine.connect()) as con:
-            trans = con.begin()
-            for table in reversed(database.Base.metadata.sorted_tables):
-                con.execute(table.delete())
-            trans.commit()
+        if self.refresh_database is True:
+            with contextlib.closing(engine.connect()) as con:
+                trans = con.begin()
+                for table in reversed(database.Base.metadata.sorted_tables):
+                    con.execute(table.delete())
+                trans.commit()

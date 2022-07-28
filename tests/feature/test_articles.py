@@ -1,17 +1,13 @@
-from sqlalchemy.orm import Session
-
 from app.repositories import article, user
-from tests.main import TestCase, TestingSessionLocal, client
+from tests.main import TestCase, client
 
 
 class TestIndexArticles(TestCase):
     endpoint = '/articles/'
-    db: Session = None
 
     def setUp(self) -> None:
         super(TestIndexArticles, self).setUp()
 
-        self.db = TestingSessionLocal()
         user.create(self.db, {
             'name': 'A',
             'email': 'email@mail.com',
@@ -57,7 +53,7 @@ class TestIndexArticles(TestCase):
         }
 
     def test_index_two_articles(self):
-        db = TestingSessionLocal()
+        db = self.db
         self.create_article({'title': 'Titre', 'content': 'Content'})
 
         user.create(db, {'name': 'B', 'email': 'mail@email.com', 'password': 'pwd'})
@@ -130,7 +126,6 @@ class TestGetArticle(TestCase):
     def setUp(self) -> None:
         super(TestGetArticle, self).setUp()
 
-        self.db = TestingSessionLocal()
         user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
@@ -163,7 +158,6 @@ class TestCreateArticle(TestCase):
     def setUp(self) -> None:
         super(TestCreateArticle, self).setUp()
 
-        self.db = TestingSessionLocal()
         user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
@@ -225,7 +219,6 @@ class TestUpdateArticle(TestCase):
     def setUp(self) -> None:
         super(TestUpdateArticle, self).setUp()
 
-        self.db = TestingSessionLocal()
         user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
@@ -286,7 +279,6 @@ class TestDeleteArticle(TestCase):
     def setUp(self) -> None:
         super(TestDeleteArticle, self).setUp()
 
-        self.db = TestingSessionLocal()
         user.create(self.db, {
             'name': 'Antonin',
             'email': 'antonin@iconosqua.re',
